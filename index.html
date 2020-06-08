@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notepad Vue.js</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>
+       Notepad Vue.js
+    </h1>
+    <div id="app">
+        <div class="left-column">
+            <ul>
+                <li v-for="(note, index) in notes"><a v-on:click="showNote(note)">{{ note.header }} {{ note.date }}</a>
+                    <button v-on:click="deleteNote(index)" class = "delete button">Удалить</button>
+                </li>
+            </ul>
+        </div>
+        <div class="center-column">
+            <textarea v-model="message" v-on:keyup.ctrl.enter="addNote" v-on:keyup.alt.delete="clearNote"></textarea>
+            <div class="buttons">
+                <button v-on:click="clearNote" class = "clear button">Очистить</button>
+                <button v-on:click="addNote" class = "add button">Добавить</button>
+            </div>
+        </div>
+        <div class="right-column">
+            <h2>Справка</h2>
+            <p>Чтобы сохранить текущую запись нажмите "Ctrl" + "Enter"</p>
+            <p>Чтобы очистить текущую запись нажмите "Alt" + "Delete"</p>
+            <p>Чтобы удалить  запись нажмите "Удалить" напротив необходимого значения</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                notes: [{header:'Новая запись', date:'', text:''}],   
+                message: '',
+            },
+            methods: {
+                addNote: function(){
+                    date = new Date();
+                    Year = date.getFullYear();
+                    Month = date.getMonth()+1;
+                    Day = date.getDate();
+                    let item = {
+                        header: this.message.slice(0, 20) + " ...",
+                        date: +Day+'.'+Month+'.'+Year,
+                        text: this.message,
+                    }
+                    if(this.message !== ''){
+                        this.notes.unshift(item);
+                        this.message = '';
+                    } else {
+                        alert('Введите текст...')
+                    }
+                },
+                showNote: function(note){
+                    if(this.message !== ''){
+                       let result = confirm('Сохраните запись или изменения будут утеряны');
+                       if(result){
+                        this.message = note.text;
+                       } 
+                    } else {
+                        this.message = note.text;
+                    }
+                },
+                clearNote: function(){
+                    if(this.message == ''){
+                        alert('Запись уже пуста')
+                    } else {
+                        let result = confirm('Вы уверены, что хотите очистить запись?')
+                        if(result){
+                            this.message = '';
+                        }
+                    }
+                },
+                deleteNote: function(index){
+                    this.notes.splice(index, 1);
+                },
+            },
+        });
+    </script>
+</body>
+</html>
